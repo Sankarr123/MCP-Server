@@ -1,0 +1,199 @@
+<div class="flex flex-col h-screen bg-gray-100">
+
+    <header class="md:flex hidden items-center justify-between py-3 px-4 sm:px-6 md:px-8 max-w-screen-xl mx-auto w-full flex-shrink-0">
+        <div class="text-2xl font-bold text-gray-900">ArchiReport AI.</div>
+        <div>
+            <button class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-150">FREE TRIAL</button>
+        </div>
+    </header>
+
+    <main class="flex-grow overflow-y-auto px-4 sm:px-6 md:px-8 pt-6 pb-28 sm:pb-32"> 
+        <div class="max-w-3xl mx-auto">
+
+            <div *ngIf="showPreview" id="data-preview-view" class="bg-white rounded-lg shadow-xl border border-gray-100 p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Preview data</h2>
+                <div class="overflow-auto border border-gray-200 rounded-lg max-h-[500px]"> 
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky top-0 z-10">
+                            <tr>                    
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region / City</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product / Category</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Sales (INR)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                            <tr *ngIf="loadingData">
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">Loading Sales Data...</td>
+                            </tr>
+                            <tr *ngFor="let record of tableData | slice:0:5; let i = index" 
+                                [class.bg-gray-100]="i % 2 === 1">                         
+                                
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ record['Order ID'] }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ record.Date }}</td>
+                                <td class="px-6 py-4 max-w-xs truncate text-gray-900">
+                                    {{ record.Region }} / {{ record.City }}
+                                </td>
+                                <td class="px-6 py-4 max-w-md text-gray-500">
+                                    {{ record.Product }} ({{ record.Category }})
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ record.Quantity }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-900 font-semibold">
+                                    {{ record.Total | currency:'INR':'symbol':'1.0-0' }}
+                                </td>
+                            </tr>
+                            <tr *ngIf="!loadingData && tableData.length === 0">
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No sales records found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-end mt-4">
+                    <button (click)="togglePreview()" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-150">Close</button>
+                </div>
+            </div>
+            <div *ngIf="!showPreview && showSuggestions" id="default-query-view" class="text-center">
+                
+                <div class="text-center md:mb-8 mb-6">
+                    <h1 class="text-2xl md:text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">ArchiReport: Your AI Project Analyst</h1>
+                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                        Instantly unlock critical insights from your project data...
+                    </p>
+                </div>
+
+                <div class="py-12 px-6 bg-white rounded-lg shadow-xl border border-gray-100 mb-12 md:mb-0">
+                    <div class="flex flex-col items-center justify-center mb-6">
+                        <div class="mb-3 w-12 h-12 flex items-center justify-center"> 
+                            <img src="assets/home.png" alt="Architecture Home Icon" class="w-full h-full object-contain">
+                        </div>
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Query Your Project Data</h2>
+                        <p class="text-sm text-gray-500">
+                            We've loaded a sample construction project portfolio. Ask a question from the suggestions, or type in your own analysis.
+                        </p>
+                    </div>
+
+                    <div class="mb-5">
+                        <p class="text-xs text-gray-400 mb-3">Sample questions (Project Portfolio) - Commercial</p>                      
+                        
+                        <div class="grid md:grid-cols-3 grid-cols-1 justify-center gap-4">             
+                            <button (click)="autofillPrompt('Compare the total sales revenue and average unit price for products sold in Chennai vs. Kolkata.')"
+                                    class="text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg px-3 py-3 border border-blue-200 transition duration-150 text-left shadow-sm">
+                                Compare the total sales revenue and average unit price for products sold in Chennai vs. Kolkata.
+                            </button>               
+                            <button (click)="autofillPrompt('Summarize the total sales of Oil across all states and break down the payment methods (Cash, Debit Card, Credit Card).')"
+                                    class="text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg px-3 py-3 border border-blue-200 transition duration-150 text-left shadow-sm">
+                                Summarize the total sales of Oil across all states and break down the payment methods (Cash, Debit Card, Credit Card).
+                            </button>
+                            <button (click)="autofillPrompt('Show the total quantity sold and revenue for all Automobile products by Company (Mahindra, Tata).')"
+                                    class="text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg px-3 py-3 border border-blue-200 transition duration-150 text-left shadow-sm">
+                                Show the total quantity sold and revenue for all Automobile products by Company (Mahindra, Tata).
+                            </button>    
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="!showPreview && analysisHistory.length > 0" id="history-view">
+                
+                <div *ngFor="let record of analysisHistory" class="mb-8">
+                    
+                    <div class="flex justify-end mb-4">            
+                        <div class="max-w-xl">
+                            <div class="bg-gray-200 text-black rounded-xl rounded-tr-none p-3 shadow-md">                      
+                                <p class="text-sm font-medium">
+                                    {{ record.query }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>                 
+
+                    <div class="bg-white rounded-lg shadow-xl border border-gray-100 p-6">
+                        
+                        <div *ngIf="record.chartData" class="mb-6 border-b border-gray-200 pb-6">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-3">Analysis</h3>
+                            <p-chart type="bar" [data]="record.chartData" [options]="basicOptions"></p-chart>
+                        </div>
+
+                        <div id="analysisTableContainer">
+                            <h3 [ngClass]="{'mt-3': !record.chartData}" class="text-lg font-semibold text-gray-700 mb-3">
+                                Summaraize Data
+                            </h3>
+
+                            <div class="overflow-auto border border-gray-200 rounded-lg max-h-[500px]"> 
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50 sticky top-0 z-10">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company / Product</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location / State</th>
+                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Sale</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                        
+                                        <tr *ngFor="let item of record.filteredRecords; let i = index" 
+                                            [class.bg-gray-100]="i % 2 === 1">                         
+                                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ item['Order ID'] }}</td>
+                                            <td class="px-6 py-4 max-w-xs truncate text-gray-900">
+                                                {{ item.Company }} ({{ item.Product }})
+                                            </td>
+                                            <td class="px-6 py-4 max-w-xs truncate text-gray-900">
+                                                {{ item.City }}, {{ item.State }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-right text-gray-900 font-semibold">
+                                                {{ item.Total | currency:'INR':'symbol':'1.0-0' }}
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr *ngIf="record.filteredRecords.length === 0">
+                                            <td colspan="4" class="px-6 py-4 text-center text-gray-500">No records match this query.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer *ngIf="!showPreview" 
+                class="fixed inset-x-0 bottom-0 w-full bg-white shadow-xl border-t border-gray-200 z-10
+                    sm:static md:static">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-3"> 
+                
+                <div class="relative mb-2">
+                    <input 
+                        type="text" 
+                        placeholder="Analyze market budget vs actuals..." 
+                        [(ngModel)]="queryPrompt"
+                        class="w-full pl-12 pr-12 py-2 sm:py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 text-sm sm:text-base"
+                    />
+                    
+                    <div class="absolute left-0 top-0 bottom-0 flex items-center pl-4">
+                        <span class="text-sm font-semibold text-green-700 bg-green-100 rounded-full w-6 h-6 flex items-center justify-center border border-green-300">A</span>
+                    </div>
+                    
+                    <button (click)="processQuery()" class="absolute right-0 top-0 bottom-0 flex items-center pr-4 text-blue-600 hover:text-blue-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.25em" height="1.25em" viewBox="0 0 24 24"><path fill="currentColor" d="m2 21l21-9L2 3v7l15 2l-15 2z"/></svg>
+                    </button>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row justify-between items-center sm:items-end text-xs text-gray-400 space-y-2 sm:space-y-0">
+                    <p class="text-center sm:text-left order-2 sm:order-1"> 
+                        ArchiReport answers are generated based on your loaded project data. <a href="#" (click)="togglePreview()" class="underline hover:text-gray-500 whitespace-nowrap">Review Data Source</a>
+                    </p>
+                    
+                    <button (click)="togglePreview()" 
+                            class="order-1 sm:order-2 text-xs font-medium text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 rounded-full px-3 py-1 sm:px-4 sm:py-1 transition duration-150 shadow-sm whitespace-nowrap">
+                        <span class="md:hidden">Preview data</span> <span class="hidden md:inline">Preview data</span> 
+                    </button>
+                </div>
+            </div>
+    </footer>
+    
+</div>

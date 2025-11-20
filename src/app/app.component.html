@@ -1,0 +1,43 @@
+<div class="md:hidden flex items-center justify-between p-4 bg-gray-800 text-white h-16 fixed top-0 inset-x-0 z-50 flex-shrink-0">
+
+  <div class="flex items-center space-x-4">
+    <button (click)="toggleSidebar()" aria-label="Toggle Sidebar" class="z-10">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>    
+    <h1 class="text-lg font-bold">
+      ArchiReport AI.
+    </h1>
+  </div>
+  <div>
+       <button class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-150">FREE TRIAL</button>
+  </div>
+</div>
+
+<div class="flex flex-1 overflow-hidden mt-16 md:mt-0 md:h-screen"> 
+  
+  <div
+    class="bg-gray-200 text-white w-64 p-4 fixed top-0 left-0 h-full transform transition-transform duration-300 z-50 md:relative md:translate-x-0 md:block"
+    [ngClass]="{
+      '-translate-x-full': !sidebarOpen,
+      'translate-x-0': sidebarOpen
+    }"
+  >
+  <app-leftbar
+    (typeChanged)="onTypeChanged($event)"
+    (closeSidebar)="toggleSidebar()"
+  ></app-leftbar>
+
+  </div>
+
+  <div
+    *ngIf="sidebarOpen"
+    class="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
+    (click)="toggleSidebar()"
+  ></div>
+
+  <div class="w-full overflow-auto bg-gray-100 flex-1">
+     <app-report-list></app-report-list>
+  </div>
+</div>
